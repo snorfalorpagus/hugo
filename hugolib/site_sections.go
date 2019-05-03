@@ -14,6 +14,7 @@
 package hugolib
 
 import (
+	"fmt"
 	"path"
 	"strconv"
 	"strings"
@@ -199,14 +200,17 @@ func (s *Site) assembleSections() pageStatePages {
 	// Build the sections hierarchy
 	for _, sect := range sectionPages {
 		sections := sect.SectionsEntries()
-		if len(sections) == 1 {
+		if len(sections) == 0 {
 			if home != nil {
 				sect.parent = home
 			}
 		} else {
-			parentSearchKey := path.Join(sect.SectionsEntries()[:len(sections)-1]...)
+			parentSearchKey := path.Join(sect.SectionsEntries()...)
 			_, v, _ := rootSections.LongestPrefix([]byte(parentSearchKey))
-			p := v.(*pageState)
+			p, ok := v.(*pageState)
+			if !ok {
+				panic(fmt.Sprintf("invalid state for key %q", parentSearchKey))
+			}
 			sect.parent = p
 		}
 

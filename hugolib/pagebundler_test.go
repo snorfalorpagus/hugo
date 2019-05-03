@@ -20,12 +20,16 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/gohugoio/hugo/hugofs"
+
 	"github.com/gohugoio/hugo/common/loggers"
 	"github.com/gohugoio/hugo/resources/page"
 
 	"github.com/gohugoio/hugo/helpers"
 
 	"io"
+
+	"github.com/gohugoio/hugo/htesting"
 
 	"github.com/spf13/afero"
 
@@ -36,7 +40,6 @@ import (
 	"fmt"
 
 	"github.com/gohugoio/hugo/deps"
-	"github.com/gohugoio/hugo/hugofs"
 	"github.com/spf13/viper"
 
 	"github.com/stretchr/testify/require"
@@ -172,6 +175,7 @@ func TestPageBundlerSiteRegular(t *testing.T) {
 						assert.Len(pageResources, 2)
 						firstPage := pageResources[0].(page.Page)
 						secondPage := pageResources[1].(page.Page)
+
 						assert.Equal(filepath.FromSlash("/work/base/b/my-bundle/1.md"), firstPage.File().Filename(), secondPage.File().Filename())
 						assert.Contains(content(firstPage), "TheContent")
 						assert.Equal(6, len(leafBundle1.Resources()))
@@ -833,7 +837,7 @@ func newTestBundleSymbolicSources(t *testing.T) (*helpers.PathSpec, func(), stri
 	fs.Destination = &afero.MemMapFs{}
 	loadDefaultSettingsFor(cfg)
 
-	workDir, clean, err := createTempDir("hugosym")
+	workDir, clean, err := htesting.CreateTempDir(hugofs.Os, "hugosym")
 	assert.NoError(err)
 
 	contentDir := "base"
